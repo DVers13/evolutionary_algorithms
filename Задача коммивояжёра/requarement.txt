@@ -1,0 +1,5 @@
+matplotlib
+streamlit
+numpy
+random
+math
