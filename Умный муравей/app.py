@@ -2,7 +2,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import time
 from field_generate import generate_field, plot_field
-from ga import GA
+from ga_3 import GA
 from ant import Ant
 import pandas as pd
 
@@ -46,19 +46,19 @@ def main():
             field = st.session_state.field
             GA_evol = GA(population_count = population_count, count_state = count_state, best_solution_count = best_solution_count, iter = iterations, field = field, coef_m = coef_m, coef_c = coef_c)
             start_time = time.time()
-            best_score, best_automat = GA_evol.run()
+            _, best_automat = GA_evol.run()
             end_time = time.time()
             execution_time = end_time - start_time
             st.write('Best automat:')
             best_automat_df = pd.DataFrame(
-                [(i[0][0], i[0][1], i[1][0], i[1][1]) for i in best_automat],
+                [(i[0], i[1], i[2], 2) for i in best_automat],
                 columns=['State_0', 'Action_0', 'State_1', 'Action_1']
             )
             st.table(best_automat_df)
-            st.write('Best score:', best_score)
-            st.write('Execution Time:', execution_time, 'seconds')
-            ant = Ant(field)
+            ant = Ant(field, max_step = 900)
             ant.run_automat(best_automat)
+            st.write('Best score:', ant.info()['score'])
+            st.write('Execution Time:', execution_time, 'seconds')
             st.write('Use state count:', len(ant.useState))
             st.write('Step count:', ant.info()['step'])
             new_field = ant.field

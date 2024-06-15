@@ -6,7 +6,7 @@ import matplotlib.patches as patches
 
 def generate_field(width, height, num_special_cells):
 
-    field = [['.' for _ in range(width)] for _ in range(height)]
+    field = np.array([['.' for _ in range(width)] for _ in range(height)])
     apple = random.choices([(i, j) for i in range(width) for j in range(height)], k = num_special_cells)
     for y, x in apple:
         field[y][x] = "S"

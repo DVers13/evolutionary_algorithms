@@ -1,6 +1,7 @@
 import numpy as np
 class Ant():
-    def __init__(self, field, max_step=900):
+    __slots__ = ("field", "field_copy", "start_pos", "max_step", "step", "current_pos", "old_pos_smb", "rotate_idx", "score", "max_score", "isFood", "useState")
+    def __init__(self, field, max_step=500):
         self.field = np.array(field)
         self.field_copy = self.field.copy()
         self.start_pos = [0, 0]
@@ -73,19 +74,36 @@ class Ant():
     def info(self):
         return {"step": self.step, "current_pos": self.current_pos, "score": self.score, "rotate_idx": self.rotate_idx, "isFood": self.isFood}
 
-    def run_automat(self, automat):
+    def run_automat(self, automat): # [[1, 2, 1, 2], [1, 2, 3, 2], ...]
         current_state = 0
-        self.useState = []
-        while self.score != self.max_score and self.step < self.max_step:
+        self.useState = set()
+        e = False
+        c = 0
+        s = current_state
+        v = []
+        for _ in range(self.max_step):
+            if self.score == self.max_score:
+                break
             if current_state not in self.useState:
-                self.useState.append(current_state)
+                self.useState.add(current_state)
             if self.isFood:
-                current_state = automat[current_state][1][0]
+                current_state = automat[current_state][2]
+                s = current_state
                 self.move_forward()
             else:
-                action = automat[current_state][0]
+                if current_state == s:
+                    c += 1
+                else:
+                    s = current_state
+                    c = 0
+                if c >= 10:
+                    e = True
+                    if s not in v:
+                        v.append(s)
+                action = automat[current_state]
                 current_state = action[0]
                 if action[1] == 2:
                     self.move_forward()
                 else:
                     self.rotate(action[1])
+        return e, v
